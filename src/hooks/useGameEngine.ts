@@ -212,6 +212,7 @@ export function useGameEngine(): UseGameEngineResult {
 
     if (usedWordsRef.current.has(candidate)) {
       setValidationError("Word already used");
+      // Don't reset chain for repeated words
       return;
     }
 
@@ -223,6 +224,8 @@ export function useGameEngine(): UseGameEngineResult {
 
     if (!validation.valid) {
       setValidationError(validation.error ?? "Invalid word");
+      // Reset chain multiplier for invalid words
+      setState((prev) => ({ ...prev, chainMultiplier: 0 }));
       return;
     }
 
@@ -233,6 +236,8 @@ export function useGameEngine(): UseGameEngineResult {
 
       if (!dictionaryResult) {
         setValidationError("Word not recognized");
+        // Reset chain multiplier for words not in dictionary
+        setState((prev) => ({ ...prev, chainMultiplier: 0 }));
         return;
       }
 
@@ -245,7 +250,8 @@ export function useGameEngine(): UseGameEngineResult {
       setState((previous) => {
         const points = calculateScore(candidate.length, previous.chainMultiplier);
         const updatedMultiplier = previous.chainMultiplier + 1;
-        const entry = createPlayedWord(candidate, points, updatedMultiplier);
+        // Store the current multiplier that was used for this word's calculation
+        const entry = createPlayedWord(candidate, points, previous.chainMultiplier);
 
         return {
           ...previous,
