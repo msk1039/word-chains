@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Word Chain Challenge",
   description:
-    "Fast-paced word chain game with letter and length constraints. Built with Next.js, TypeScript, and shadcn UI.",
+    "Fast-paced word chain game with letter and length constraints.",
+  icons: {
+    icon: "/favicon.ico?v=" + Date.now(),
+  },
 };
 
 export default async function RootLayout({
@@ -27,6 +30,9 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-slate-100">
+      <head>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
       >

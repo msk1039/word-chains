@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮WordChains 
 
-## Getting Started
+A fast-paced daily word-building challenge where players race against time to create the longest chain of connected words and climb the global leaderboard.
 
-First, run the development server:
+![Game Screenshot](./public/game-screenshot.png)
+
+##  How to Play
+
+Start with the daily letter, type valid words that connect to each other, and watch your score multiply as you build longer chains. The longer your streak of valid words, the higher your multiplier—leading to exponentially growing scores!
+
+##  Game Rules
+
+- **Daily Challenge**: Get a new random starting letter each day at midnight IST
+- **Time Limit**: 60 seconds to build your word chain
+- **Word Length**: Minimum 4 letters; each word must be ±1 letter from the previous (but never below 4)
+- **Chain Rule**: Next word must start with the last letter of your previous word
+- **Dictionary**: Only valid English words accepted
+- **No Repeats**: Can't use the same word twice in one game
+
+##  Scoring System
+
+Your score grows **exponentially** through the chain multiplier system:
+
+- **Base Points**: Each word = letter count × 10 (e.g., "WORD" = 4 × 10 = 40 points)
+- **Chain Multiplier**: Starts at 1.0x and increases by 0.5x with each consecutive valid word
+- **Exponential Growth**: 1.0x → 1.5x → 2.0x → 2.5x → 3.0x and so on!
+
+**Example**: 
+- Word 1 (4 letters): (4 × 10) × 1.0x = **40 pts**
+- Word 2 (5 letters): (5 × 10) × 1.5x = **75 pts**
+- Word 3 (6 letters): (6 × 10) × 2.0x = **120 pts**
+- Word 4 (5 letters): (5 × 10) × 2.5x = **125 pts**
+
+⚠️ **Break the Chain**: Invalid words reset your multiplier back to 1.0x, but repeated words just give a warning.
+
+## 🖼️ Screenshots
+
+<!-- Add game screenshots here -->
+
+## 🚀 Features
+
+- **Daily Challenges**: New letter every day at midnight IST
+- **Global Leaderboard**: Compete with players worldwide
+- **Chain Multipliers**: Build massive scores with consecutive valid words
+- **Real-time Validation**: Instant feedback on word validity
+- **Responsive Design**: Play seamlessly on desktop and mobile
+- **User Authentication**: Track your progress and rankings
+- **Score History**: View your word chain and points breakdown
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Dictionary API**: dictionaryapi.dev
+- **Deployment**: Vercel
+
+## 📦 Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Add your Supabase credentials
+
+# Run database migrations
+# See docs/schema.sql for database setup
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to start playing!
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔧 Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-## Learn More
+## 🎮 Strategy Tips
 
-To learn more about Next.js, take a look at the following resources:
+1. **Plan Ahead**: Think about what letters will give you more options
+2. **Use Longer Words**: More letters = more base points
+3. **Protect Your Chain**: Verify words before submitting to avoid multiplier resets
+4. **Speed Matters**: You have 60 seconds, but accuracy is more important than speed
+5. **Know Common Endings**: Letters like E, S, R, T give you more word options
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📝 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is open source and available under the MIT License.
 
-## Deploy on Vercel
+## 🤝 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page or submit a pull request.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+Built with ❤️ using Next.js and Supabase

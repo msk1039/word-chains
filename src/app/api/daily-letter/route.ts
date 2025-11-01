@@ -17,7 +17,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from("daily_letters")
       .select("id, letter, challenge_date, is_active")
-      .eq("challenge_date", today)
+      .eq("is_active", true)
       .single();
 
     if (error) {
