@@ -18,6 +18,14 @@ interface UseGameEngineResult {
   isWordUsed: (word: string) => boolean;
   sanitizeInput: (raw: string) => string;
   isSubmitting: boolean;
+  startGame: () => void;
+}
+
+interface DailyLetter {
+  id: string | null;
+  letter: string;
+  challenge_date: string;
+  fallback: boolean;
 }
 
 const createInitialState = (startingLetter: string): GameState => ({
@@ -25,7 +33,7 @@ const createInitialState = (startingLetter: string): GameState => ({
   wordChain: [],
   score: 0,
   timeRemaining: INITIAL_TIME_SECONDS,
-  gameStatus: "playing",
+  gameStatus: "idle",
   lastWordLength: 0,
   chainMultiplier: 0,
   bestChainMultiplier: 0,
@@ -47,11 +55,13 @@ const createPlayedWord = (
 });
 
 export function useGameEngine(): UseGameEngineResult {
-  const [state, setState] = useState<GameState>(() => createInitialState(getRandomLetter()));
+  const [state, setState] = useState<GameState>(() => createInitialState("A"));
   const [inputValue, setInputValue] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const usedWordsRef = useRef<Set<string>>(new Set());
+  const dailyLetterRef = useRef<DailyLetter | null>(null);
+  const sessionSubmittedRef = useRef(false);
 
   const allowedLengths = useMemo(() => getValidLengths(state.lastWordLength), [state.lastWordLength]);
 
@@ -60,10 +70,84 @@ export function useGameEngine(): UseGameEngineResult {
     return onlyLetters.slice(0, MAX_WORD_LENGTH).toUpperCase();
   }, []);
 
+  // Fetch daily letter on mount
+  useEffect(() => {
+    const fetchDailyLetter = async () => {
+      try {
+        const response = await fetch("/api/daily-letter");
+        if (response.ok) {
+          const data: DailyLetter = await response.json();
+          dailyLetterRef.current = data;
+          setState((prev) => ({
+            ...prev,
+            currentLetter: data.letter,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch daily letter:", error);
+        // Fallback to random letter
+        const letter = getRandomLetter();
+        dailyLetterRef.current = {
+          id: null,
+          letter,
+          challenge_date: new Date().toISOString().split("T")[0] || "",
+          fallback: true,
+        };
+      }
+    };
+
+    fetchDailyLetter();
+  }, []);
+
+  // Submit game session when game ends
+  useEffect(() => {
+    const submitSession = async () => {
+      if (
+        state.gameStatus === "finished" &&
+        state.wordChain.length > 0 &&
+        !sessionSubmittedRef.current
+      ) {
+        sessionSubmittedRef.current = true;
+
+        try {
+          const response = await fetch("/api/game-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              score: state.score,
+              chain_multiplier_max: state.bestChainMultiplier,
+              total_words: state.wordChain.length,
+              daily_letter_id: dailyLetterRef.current?.id,
+              words_played: state.wordChain,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            // If user is not authenticated, that's okay - game still played
+            if (response.status !== 401) {
+              console.error("Failed to submit game session:", errorData);
+            }
+          }
+        } catch (error) {
+          console.error("Error submitting game session:", error);
+        }
+      }
+    };
+
+    submitSession();
+  }, [state.gameStatus, state.wordChain, state.score, state.bestChainMultiplier]);
+
   const startGame = useCallback(() => {
-    const letter = getRandomLetter();
+    const letter = dailyLetterRef.current?.letter || getRandomLetter();
     usedWordsRef.current = new Set();
-    setState(createInitialState(letter));
+    sessionSubmittedRef.current = false;
+    setState({
+      ...createInitialState(letter),
+      gameStatus: "playing",
+    });
     setInputValue("");
     setValidationError(null);
     setIsSubmitting(false);
@@ -197,5 +281,6 @@ export function useGameEngine(): UseGameEngineResult {
     isWordUsed,
     sanitizeInput,
     isSubmitting,
+    startGame,
   };
 }

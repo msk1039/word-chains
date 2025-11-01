@@ -12,46 +12,64 @@ export function WordChain({ words }: WordChainProps) {
   const hasWords = words.length > 0;
 
   return (
-    <Card className="flex h-full flex-col border-none bg-white/70 shadow-lg">
-      <CardHeader className="border-none pb-0">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-slate-500">Word Chain</p>
-          <p className="text-xl font-semibold text-slate-900">Words played ({words.length})</p>
+    <Card className="border-border bg-card/90 shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Word History</h2>
+          <Badge variant="secondary" className="text-sm">
+            {words.length} {words.length === 1 ? "word" : "words"}
+          </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 pb-6">
+      <CardContent className="pb-4">
         {hasWords ? (
-          <ScrollArea className="h-72">
-            <ul className="space-y-3 pr-1">
-              {words.map((entry, index) => {
-                const isLatest = index === words.length - 1;
+          <ScrollArea className="h-64 pr-4">
+            <ul className="space-y-2">
+              {[...words].reverse().map((entry, index) => {
+                const originalIndex = words.length - 1 - index;
+                const isLatest = originalIndex === words.length - 1;
                 return (
                   <li
                     key={entry.id}
                     className={cn(
-                      "flex items-center justify-between rounded-lg border px-4 py-3 text-sm shadow-sm",
-                      isLatest ? "border-indigo-200 bg-indigo-50/80" : "border-slate-200 bg-white",
+                      "flex items-center justify-between rounded-lg border px-3 py-2.5 transition-colors",
+                      isLatest 
+                        ? "border-primary/30 bg-primary/5 shadow-sm" 
+                        : "border-border bg-card hover:bg-accent/50",
                     )}
                   >
-                    <div>
-                      <p className="text-base font-semibold tracking-wide text-slate-900">
-                        {entry.value.toUpperCase()}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        +{entry.pointsAwarded} pts &bull; multiplier x{entry.multiplierApplied}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                        {originalIndex + 1}
+                      </div>
+                      <div>
+                        <p className={cn(
+                          "text-base font-semibold tracking-wide",
+                          isLatest ? "text-primary" : "text-foreground"
+                        )}>
+                          {entry.value.toUpperCase()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          +{entry.pointsAwarded} pts • x{(1 + entry.multiplierApplied * 0.5).toFixed(1)} multiplier
+                        </p>
+                      </div>
                     </div>
-                    <Badge variant="secondary">{entry.length} letters</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {entry.length}
+                    </Badge>
                   </li>
                 );
               })}
             </ul>
           </ScrollArea>
         ) : (
-          <div className="flex h-72 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50/70 text-center">
-            <p className="max-w-[16rem] text-sm text-slate-500">
-              Start typing words to build your chain. Each word must follow the letter and length rules.
-            </p>
+          <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50">
+            <div className="max-w-[200px] text-center">
+              <p className="text-sm font-medium text-foreground">No words yet</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Start typing to build your chain!
+              </p>
+            </div>
           </div>
         )}
       </CardContent>

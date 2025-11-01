@@ -1,0 +1,37 @@
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Supabase environment variables are missing. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set.",
+  );
+}
+
+export async function getSupabaseServerClient() {
+  const cookieStore = await cookies();
+
+  return createServerClient(supabaseUrl as string, supabaseAnonKey as string, {
+    cookies: {
+      get(name) {
+        return cookieStore.get(name)?.value;
+      },
+      set(name, value, options) {
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // Ignore errors when called in read-only context (e.g., Server Components)
+        }
+      },
+      remove(name, options) {
+        try {
+          cookieStore.delete({ name, ...options });
+        } catch {
+          // Ignore errors when called in read-only context
+        }
+      },
+    },
+  });
+}
