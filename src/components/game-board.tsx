@@ -126,6 +126,7 @@ export function GameBoard({
                 onChange={(value) => onInputChange(value.toUpperCase())}
                 disabled={isDisabled || isSubmitting}
                 className={cn(getInputBorderColor())}
+                inputMode="text"
               >
                 {isSpecialCase35 || allowedLengths.length === 1 ? (
                   // Render a single group for the special case [3, 5] or when only one length is allowed
