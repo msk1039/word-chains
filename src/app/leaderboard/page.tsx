@@ -1,10 +1,18 @@
 import { fetchTodayLeaderboard } from "@/lib/data/leaderboard";
 import { Button } from "@/components/ui/button";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
   const entries = await fetchTodayLeaderboard();
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  
+  const currentUserId = session?.user?.id;
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl flex-col gap-6 px-4 py-10">
@@ -41,20 +49,39 @@ export default async function LeaderboardPage() {
                 </td>
               </tr>
             ) : (
-              entries.map((entry, index) => (
-                <tr key={entry.user_id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-600">#{index + 1}</td>
-                  <td className="px-4 py-3 font-medium text-slate-900">
-                    {entry.display_name || "Player"}
-                  </td>
-                  <td className="px-4 py-3 font-semibold text-indigo-600">{entry.best_score}</td>
-                  <td className="px-4 py-3 text-amber-600 font-medium">x{entry.best_chain}</td>
-                  <td className="px-4 py-3 text-slate-600">{entry.games_today}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">
-                    {new Date(entry.last_played).toLocaleString()}
-                  </td>
-                </tr>
-              ))
+              entries.map((entry, index) => {
+                const isCurrentUser = currentUserId && entry.user_id === currentUserId;
+                return (
+                  <tr 
+                    key={entry.user_id} 
+                    className={cn(
+                      "transition-colors",
+                      isCurrentUser 
+                        ? "bg-primary/10 hover:bg-primary/15 border-l-4 border-l-primary" 
+                        : "hover:bg-slate-50"
+                    )}
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-600">
+                      #{index + 1}
+                      {isCurrentUser && (
+                        <span className="ml-2 text-xs font-semibold text-primary">(You)</span>
+                      )}
+                    </td>
+                    <td className={cn(
+                      "px-4 py-3 font-medium",
+                      isCurrentUser ? "text-primary font-semibold" : "text-slate-900"
+                    )}>
+                      {entry.display_name || "Player"}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-indigo-600">{entry.best_score}</td>
+                    <td className="px-4 py-3 text-amber-600 font-medium">x{entry.best_chain}</td>
+                    <td className="px-4 py-3 text-slate-600">{entry.games_today}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      {new Date(entry.last_played).toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

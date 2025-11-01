@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { MobileNav } from "@/components/mobile-nav";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { HowToPlayDialog } from "@/components/how-to-play-dialog";
 
 export async function NavBar() {
   const supabase = await getSupabaseServerClient();
@@ -33,6 +34,9 @@ export async function NavBar() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          {/* How to Play button - visible on all screen sizes */}
+          <HowToPlayDialog />
+          
           {/* Desktop Navigation */}
           <div className="hidden sm:flex sm:items-center sm:gap-2">
             {session ? (
