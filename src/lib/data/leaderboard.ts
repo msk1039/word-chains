@@ -31,7 +31,7 @@ export async function fetchAllTimeLeaderboard(limit = 50): Promise<LeaderboardEn
     .from("all_time_leaderboard")
     .select("*")
     .limit(limit);
-
+  
   if (error || !data) {
     console.error("Unable to fetch all-time leaderboard", error);
     return [];

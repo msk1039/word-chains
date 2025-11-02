@@ -1,12 +1,13 @@
-import { fetchTodayLeaderboard } from "@/lib/data/leaderboard";
+import { fetchAllTimeLeaderboard } from "@/lib/data/leaderboard";
 import { Button } from "@/components/ui/button";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { RefreshButton } from "@/components/refresh-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
-  const entries = await fetchTodayLeaderboard();
+  const entries = await fetchAllTimeLeaderboard();
   const supabase = await getSupabaseServerClient();
   const {
     data: { session },
@@ -18,16 +19,12 @@ export default async function LeaderboardPage() {
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl flex-col gap-6 px-4 py-10">
       <header className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold text-slate-900">Today&apos;s Leaderboard</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">All-Time Leaderboard</h1>
           <p className="text-sm text-slate-600">
-            Best scores from today&apos;s challenge. Each player&apos;s highest score is shown.
+            Top players of all time. Each player&apos;s best score across all challenges.
           </p>
         </div>
-        <form>
-          <Button type="submit" variant="outline">
-            Refresh
-          </Button>
-        </form>
+        <RefreshButton />
       </header>
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white/80 shadow-sm">
         <table className="min-w-full table-fixed border-collapse">
@@ -37,7 +34,7 @@ export default async function LeaderboardPage() {
               <th className="px-4 py-3">Player</th>
               <th className="px-4 py-3 w-28">Best Score</th>
               <th className="px-4 py-3 w-28">Best Chain</th>
-              <th className="px-4 py-3 w-28">Games Today</th>
+              <th className="px-4 py-3 w-28">Total Games</th>
               <th className="px-4 py-3 w-40">Last Played</th>
             </tr>
           </thead>
@@ -45,7 +42,7 @@ export default async function LeaderboardPage() {
             {entries.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
-                  No results yet. Be the first to play today!
+                  No results yet. Be the first to play!
                 </td>
               </tr>
             ) : (
@@ -75,7 +72,7 @@ export default async function LeaderboardPage() {
                     </td>
                     <td className="px-4 py-3 font-semibold text-indigo-600">{entry.best_score}</td>
                     <td className="px-4 py-3 text-amber-600 font-medium">x{entry.best_chain}</td>
-                    <td className="px-4 py-3 text-slate-600">{entry.games_today}</td>
+                    <td className="px-4 py-3 text-slate-600">{entry.total_games}</td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
                       {new Date(entry.last_played).toLocaleString()}
                     </td>
