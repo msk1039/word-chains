@@ -3,6 +3,7 @@
 import { GameBoard } from "@/components/game-board";
 import { GameOver } from "@/components/game-over";
 import { WordChain } from "@/components/word-chain";
+import { Footer } from "@/components/footer";
 import { useGameEngine } from "@/hooks/useGameEngine";
 import { formatTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,9 @@ export default function Home() {
   } = useGameEngine();
 
   return (
-    <main className="relative flex min-h-[calc(100vh-4rem)] items-start justify-center bg-background p-4 sm:p-6 lg:p-12">
-      <div className="relative z-10 w-full max-w-lg space-y-4">
+    <>
+      <main className="relative flex min-h-[calc(100vh-4rem)] items-start justify-center bg-background p-4 sm:p-6 lg:p-12">
+        <div className="relative z-10 w-full max-w-lg space-y-4">
         {/* Timer and Score - Top Row */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 inline-flex items-center gap-3 rounded-2xl border-2 border-border bg-muted px-6 py-4 shadow-lg ring-2 ring-ring/10">
@@ -101,6 +103,8 @@ export default function Home() {
         {/* Side accent */}
         <div className="absolute top-1/2 -left-32 h-64 w-64 -translate-y-1/2 rounded-full bg-secondary/10 blur-3xl" />
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }
